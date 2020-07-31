@@ -1,5 +1,4 @@
 import requests
-import selenium
 from requests.auth import HTTPBasicAuth 
 from bs4 import BeautifulSoup
 import os
@@ -7,6 +6,10 @@ import json
 import time
 import argparse
 from collections import deque
+from selenium import webdriver
+
+CHROME_DRIVER_PATH = r"./chromedriver"				# change to the version with your cpu type and matches chrome build version
+
 
 def main():
 	parser = argparse.ArgumentParser()
@@ -15,6 +18,9 @@ def main():
 	kwargs = parser.parse_args()
 	ProblemID1 = int(kwargs.ProblemID1)
 	ProblemID2 = int(kwargs.ProblemID2)
+
+	# start chrome webdriver
+	driver = webdriver.Chrome(CHROME_DRIVER_PATH)
 
 	# Read user ids
 	fi = open('id.in', 'r')
@@ -60,9 +66,12 @@ def main():
 		url = 'https://leetcode.com/'+id	
 		print(url)
 			
-		r = requests.get(url,headers = headers) 
+		# r = requests.get(url,headers = headers) 
+		driver.get(url)
+		html = driver.page_source.encode('utf')
 		time.sleep(5)
-		profile = BeautifulSoup(r.text,features="html.parser") 
+		# profile = BeautifulSoup(r.text,features="html.parser") 
+		profile = BeautifulSoup(html, features="html.parser")
 	
 		recentProblems = profile.select('.list-group-item')[::-1][0:20]
 		if len(recentProblems)==0:
